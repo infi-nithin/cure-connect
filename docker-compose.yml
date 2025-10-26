@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - cure-connect-network
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8060:8060"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cureconnect
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - cure-connect-network
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=cureconnect
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - cure-connect-network
+
+networks:
+  cure-connect-network:
+    driver: bridge

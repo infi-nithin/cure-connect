@@ -97,7 +97,7 @@ socket.on('chatHistory', (history[]) => { ... });
 ## Running the Application
 The Angular development server is configured to:
 - Run on port 5000
-- Allow all hosts (for Replit environment)
+- Allow all hosts
 - Hot reload on file changes
 
 Command: `npm start`
