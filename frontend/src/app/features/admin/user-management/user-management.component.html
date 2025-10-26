@@ -1,0 +1,49 @@
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">User Management</h5>
+      <button class="btn btn-primary" (click)="showModal = true">Add User</button>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td><span class="badge bg-primary">{{ user.role }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create User</h5>
+          <button type="button" class="btn-close" (click)="showModal = false"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="userForm">
+            <div class="mb-3"><input type="text" class="form-control" formControlName="firstName" placeholder="First Name"></div>
+            <div class="mb-3"><input type="text" class="form-control" formControlName="lastName" placeholder="Last Name"></div>
+            <div class="mb-3"><input type="email" class="form-control" formControlName="email" placeholder="Email"></div>
+            <div class="mb-3">
+              <select class="form-select" formControlName="role">
+                <option value="PATIENT">Patient</option>
+                <option value="DOCTOR">Doctor</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showModal = false">Close</button>
+          <button type="button" class="btn btn-primary" (click)="createUser()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

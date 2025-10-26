@@ -1,0 +1,139 @@
+<div class="dashboard-wrapper">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-hospital text-primary"></i>
+        <strong>Cure Connect</strong>
+      </a>
+      <div class="d-flex align-items-center">
+        <span class="me-3">
+          <i class="bi bi-person-circle"></i>
+          {{ currentUser?.firstName }} {{ currentUser?.lastName }} (Admin)
+        </span>
+        <button class="btn btn-outline-danger btn-sm" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-4">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="mb-0">Admin Dashboard</h2>
+        <p class="text-muted">System Overview and Management</p>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading">
+      <div class="row g-4 mb-4">
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Total Users</h6>
+                  <h3 class="mb-0">{{ stats.totalUsers }}</h3>
+                </div>
+                <div class="stat-icon bg-primary">
+                  <i class="bi bi-people"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Doctors</h6>
+                  <h3 class="mb-0">{{ stats.totalDoctors }}</h3>
+                </div>
+                <div class="stat-icon bg-success">
+                  <i class="bi bi-person-badge"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Patients</h6>
+                  <h3 class="mb-0">{{ stats.totalPatients }}</h3>
+                </div>
+                <div class="stat-icon bg-info">
+                  <i class="bi bi-person"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Appointments</h6>
+                  <h3 class="mb-0">{{ stats.totalAppointments }}</h3>
+                </div>
+                <div class="stat-icon bg-warning">
+                  <i class="bi bi-calendar-check"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">
+                <i class="bi bi-tools"></i> Quick Actions
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="action-card" (click)="manageUsers()">
+                    <i class="bi bi-people-fill"></i>
+                    <h6>Manage Users</h6>
+                    <p class="text-muted mb-0">View and manage all users</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="action-card">
+                    <i class="bi bi-gear-fill"></i>
+                    <h6>System Settings</h6>
+                    <p class="text-muted mb-0">Configure system parameters</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="action-card">
+                    <i class="bi bi-graph-up"></i>
+                    <h6>View Reports</h6>
+                    <p class="text-muted mb-0">Analytics and insights</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

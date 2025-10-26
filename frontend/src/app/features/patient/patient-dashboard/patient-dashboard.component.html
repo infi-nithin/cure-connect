@@ -1,0 +1,183 @@
+<div class="dashboard-wrapper">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-hospital text-primary"></i>
+        <strong>Cure Connect</strong>
+      </a>
+      <div class="d-flex align-items-center">
+        <span class="me-3">
+          <i class="bi bi-person-circle"></i>
+          {{ currentUser?.firstName }} {{ currentUser?.lastName }}
+        </span>
+        <button class="btn btn-outline-danger btn-sm" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-4">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="mb-0">Patient Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ currentUser?.firstName }}!</p>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading">
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Upcoming Appointments</h6>
+                  <h3 class="mb-0">{{ upcomingAppointments.length }}</h3>
+                </div>
+                <div class="stat-icon bg-primary">
+                  <i class="bi bi-calendar-check"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Active Prescriptions</h6>
+                  <h3 class="mb-0">{{ recentPrescriptions.length }}</h3>
+                </div>
+                <div class="stat-icon bg-success">
+                  <i class="bi bi-prescription2"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card stat-card clickable" (click)="bookAppointment()">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Book New</h6>
+                  <h3 class="mb-0">Appointment</h3>
+                </div>
+                <div class="stat-icon bg-info">
+                  <i class="bi bi-plus-circle"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">
+                <i class="bi bi-calendar3"></i> Next Appointment
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="nextAppointment; else noAppointment">
+                <div class="appointment-card">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h6 class="mb-1">Dr. {{ nextAppointment.doctorName }}</h6>
+                      <p class="text-muted mb-0">
+                        <small>{{ nextAppointment.doctorSpecialization }}</small>
+                      </p>
+                    </div>
+                    <span class="badge bg-primary">{{ nextAppointment.status }}</span>
+                  </div>
+                  <div class="appointment-details">
+                    <p class="mb-2">
+                      <i class="bi bi-calendar3 text-primary"></i>
+                      {{ nextAppointment.dateTime | date: 'fullDate' }}
+                    </p>
+                    <p class="mb-2">
+                      <i class="bi bi-clock text-primary"></i>
+                      {{ nextAppointment.dateTime | date: 'shortTime' }}
+                    </p>
+                    <p class="mb-0" *ngIf="nextAppointment.reason">
+                      <i class="bi bi-chat-left-text text-primary"></i>
+                      {{ nextAppointment.reason }}
+                    </p>
+                  </div>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" (click)="viewAppointments()">
+                  View All Appointments
+                </button>
+              </div>
+              <ng-template #noAppointment>
+                <div class="text-center py-5">
+                  <i class="bi bi-calendar-x display-1 text-muted"></i>
+                  <p class="text-muted mt-3">No upcoming appointments</p>
+                  <button class="btn btn-primary" (click)="bookAppointment()">
+                    Book an Appointment
+                  </button>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">
+                <i class="bi bi-prescription2"></i> Recent Prescriptions
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="recentPrescriptions.length > 0; else noPrescriptions">
+                <div class="prescription-item" *ngFor="let prescription of recentPrescriptions">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <h6 class="mb-1">{{ prescription.medication }}</h6>
+                      <p class="text-muted mb-1">
+                        <small>Prescribed by Dr. {{ prescription.doctorName }}</small>
+                      </p>
+                      <p class="mb-0">
+                        <small>
+                          <strong>Dosage:</strong> {{ prescription.dosage }} | 
+                          <strong>Duration:</strong> {{ prescription.duration }}
+                        </small>
+                      </p>
+                    </div>
+                    <div class="text-end">
+                      <small class="text-muted">
+                        {{ prescription.prescribedDate | date: 'shortDate' }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-primary w-100 mt-3" (click)="viewPrescriptions()">
+                  View All Prescriptions
+                </button>
+              </div>
+              <ng-template #noPrescriptions>
+                <div class="text-center py-5">
+                  <i class="bi bi-file-medical display-1 text-muted"></i>
+                  <p class="text-muted mt-3">No prescriptions found</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

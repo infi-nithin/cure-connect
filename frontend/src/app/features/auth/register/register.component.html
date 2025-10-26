@@ -1,0 +1,140 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <h2 class="auth-title">
+        <i class="bi bi-hospital"></i> Cure Connect
+      </h2>
+      <p class="text-muted">Create your account</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="firstName" class="form-label">First Name</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="firstName" 
+            formControlName="firstName"
+            [class.is-invalid]="submitted && f['firstName'].errors"
+            placeholder="John">
+          <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback">
+            First name is required
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="lastName" 
+            formControlName="lastName"
+            [class.is-invalid]="submitted && f['lastName'].errors"
+            placeholder="Doe">
+          <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback">
+            Last name is required
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          formControlName="email"
+          [class.is-invalid]="submitted && f['email'].errors"
+          placeholder="john.doe@example.com">
+        <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+          <div *ngIf="f['email'].errors['required']">Email is required</div>
+          <div *ngIf="f['email'].errors['email']">Email must be valid</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="phone" class="form-label">Phone Number (Optional)</label>
+        <input 
+          type="tel" 
+          class="form-control" 
+          id="phone" 
+          formControlName="phone"
+          placeholder="+1 (555) 000-0000">
+      </div>
+
+      <div class="mb-3">
+        <label for="role" class="form-label">Register As</label>
+        <select 
+          class="form-select" 
+          id="role" 
+          formControlName="role"
+          [class.is-invalid]="submitted && f['role'].errors">
+          <option value="PATIENT">Patient</option>
+          <option value="DOCTOR">Doctor</option>
+        </select>
+      </div>
+
+      <div class="mb-3" *ngIf="registerForm.value.role === 'DOCTOR'">
+        <label for="specialization" class="form-label">Specialization</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="specialization" 
+          formControlName="specialization"
+          [class.is-invalid]="submitted && f['specialization'].errors"
+          placeholder="e.g., Cardiology, Dentistry">
+        <div *ngIf="submitted && f['specialization'].errors" class="invalid-feedback">
+          Specialization is required for doctors
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          formControlName="password"
+          [class.is-invalid]="submitted && f['password'].errors"
+          placeholder="Minimum 6 characters">
+        <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+          <div *ngIf="f['password'].errors['required']">Password is required</div>
+          <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="confirmPassword" 
+          formControlName="confirmPassword"
+          [class.is-invalid]="submitted && f['confirmPassword'].errors"
+          placeholder="Re-enter password">
+        <div *ngIf="submitted && f['confirmPassword'].errors" class="invalid-feedback">
+          Please confirm your password
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn btn-primary w-100 mb-3" 
+        [disabled]="loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Create Account
+      </button>
+
+      <div class="text-center">
+        <p class="mb-0">Already have an account? 
+          <a routerLink="/auth/login" class="text-primary">Sign In</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

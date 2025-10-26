@@ -1,0 +1,14 @@
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-header bg-white"><h5 class="mb-0">Medical Notes</h5></div>
+    <div class="card-body">
+      <form [formGroup]="notesForm" (ngSubmit)="saveNotes()">
+        <div class="mb-3">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" rows="10" formControlName="notes"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Notes</button>
+      </form>
+    </div>
+  </div>
+</div>

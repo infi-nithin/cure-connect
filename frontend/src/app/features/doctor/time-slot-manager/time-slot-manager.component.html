@@ -1,0 +1,76 @@
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-header bg-white">
+      <h5 class="mb-0"><i class="bi bi-calendar3"></i> Time Slot Manager</h5>
+      <p class="text-muted mb-0 small">Manage your availability by creating time slots</p>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="slotForm" (ngSubmit)="addSlot()" class="mb-4">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" formControlName="date">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Start Time</label>
+            <input type="time" class="form-control" formControlName="startTime">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">End Time</label>
+            <input type="time" class="form-control" formControlName="endTime">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Recurring</label>
+            <select class="form-select" formControlName="recurring">
+              <option [value]="false">One-time</option>
+              <option [value]="true">Weekly</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-plus-circle"></i> Add Slot
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let slot of slots">
+              <td>{{ slot.startTime | date: 'shortDate' }}</td>
+              <td>{{ slot.startTime | date: 'shortTime' }}</td>
+              <td>{{ slot.endTime | date: 'shortTime' }}</td>
+              <td>
+                <span class="badge bg-info">
+                  {{ slot.recurring ? 'Recurring' : 'One-time' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class.bg-success]="slot.isAvailable" [class.bg-secondary]="!slot.isAvailable">
+                  {{ slot.isAvailable ? 'Available' : 'Booked' }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-danger" (click)="deleteSlot(slot.id)">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

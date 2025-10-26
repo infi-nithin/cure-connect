@@ -1,0 +1,31 @@
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">My Prescriptions</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Medication</th>
+              <th>Dosage</th>
+              <th>Duration</th>
+              <th>Doctor</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of prescriptions">
+              <td>{{ p.medication }}</td>
+              <td>{{ p.dosage }}</td>
+              <td>{{ p.duration }}</td>
+              <td>Dr. {{ p.doctorName }}</td>
+              <td>{{ p.prescribedDate | date: 'shortDate' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

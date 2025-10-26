@@ -1,0 +1,38 @@
+.booking-container {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.doctor-card, .slot-card {
+  padding: 20px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+  }
+}
+
+.slot-card {
+  text-align: center;
+  
+  i {
+    font-size: 2rem;
+    color: #667eea;
+  }
+}
+
+.summary-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.progress {
+  height: 10px;
+}

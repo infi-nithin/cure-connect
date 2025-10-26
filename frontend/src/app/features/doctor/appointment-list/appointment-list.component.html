@@ -1,0 +1,20 @@
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-header bg-white"><h5 class="mb-0">All Appointments</h5></div>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr><th>Date</th><th>Time</th><th>Patient</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let apt of appointments">
+            <td>{{ apt.dateTime | date: 'shortDate' }}</td>
+            <td>{{ apt.dateTime | date: 'shortTime' }}</td>
+            <td>{{ apt.patientName }}</td>
+            <td><span class="badge bg-primary">{{ apt.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
