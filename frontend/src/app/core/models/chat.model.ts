@@ -1,21 +1,10 @@
-export interface ChatMessage {
-  id: number;
-  appointmentId: number;
-  senderId: number;
-  senderName: string;
-  receiverId: number;
-  message: string;
-  timestamp: Date;
-  isRead: boolean;
-}
+import { User } from './user.model';
 
-export interface ChatRoom {
-  appointmentId: number;
-  patientId: number;
-  patientName: string;
-  doctorId: number;
-  doctorName: string;
-  lastMessage?: string;
-  lastMessageTime?: Date;
-  unreadCount: number;
+export interface ChatMessage {
+  id: string; 
+  sender: User;
+  receiver: User;
+  messageText: string;
+  sentAt: Date;
+  isRead: boolean;
 }

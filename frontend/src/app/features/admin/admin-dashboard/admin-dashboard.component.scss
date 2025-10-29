@@ -5,10 +5,16 @@
 
 .stat-card {
   transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  border-radius: 12px;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-body {
+    padding: 1.5rem;
   }
 }
 
@@ -24,38 +30,138 @@
 }
 
 .action-card {
-  padding: 30px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  background: white;
+  border: 2px solid #f8f9fa;
+  border-radius: 12px;
   text-align: center;
-  cursor: pointer;
   transition: all 0.3s ease;
+  height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   
-  &:hover {
-    background: #e9ecef;
-    transform: translateY(-2px);
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      border-color: #667eea;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
+    }
   }
   
-  i {
-    font-size: 2.5rem;
-    color: #667eea;
-    margin-bottom: 15px;
+  .action-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.75rem;
+    margin: 0 auto 1rem;
   }
   
   h6 {
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
     font-weight: 600;
+    color: #2d3748;
+  }
+  
+  p {
+    font-size: 0.875rem;
+    line-height: 1.4;
   }
 }
 
 .card-header {
   border-bottom: 2px solid #f0f0f0;
-  padding: 15px 20px;
+  padding: 1.25rem 1.5rem;
   
   h5 {
     i {
-      margin-right: 8px;
-      color: #667eea;
+      margin-right: 0.5rem;
     }
+  }
+}
+
+.system-status {
+  .status-item {
+    padding: 0.5rem 0;
+    
+    span:first-child {
+      font-weight: 500;
+      color: #4a5568;
+    }
+    
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.375rem 0.75rem;
+    }
+  }
+}
+
+.loading-spinner {
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+// Color utilities for badges and icons
+.bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+.bg-success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important; }
+.bg-info { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important; }
+.bg-warning { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%) !important; }
+.bg-secondary { background: linear-gradient(135deg, #a0aec0 0%, #718096 100%) !important; }
+.bg-dark { background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%) !important; }
+
+// Responsive design
+@media (max-width: 768px) {
+  .stat-card .card-body {
+    padding: 1.25rem;
+  }
+  
+  .action-card {
+    padding: 1.5rem 1rem;
+    
+    .action-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+    }
+  }
+  
+  .card-header {
+    padding: 1rem 1.25rem;
+  }
+}
+
+// Animation for cards
+.stat-card, .action-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.justify-content-center {
+  justify-content: center !important;
+}
+
+@media (max-width: 768px) {
+  .action-card {
+    margin-bottom: 1rem;
   }
 }

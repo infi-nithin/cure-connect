@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cureconnect.app.dto.LoginDto;
 import com.cureconnect.app.dto.RegisterDto;
 import com.cureconnect.app.dto.UserDto;
-import com.cureconnect.app.entity.User;
 import com.cureconnect.app.exception.InvalidRequestException;
 import com.cureconnect.app.service.JwtService;
 import com.cureconnect.app.service.UserService;
@@ -40,8 +39,14 @@ public class AuthenticationController {
             @RequestParam(defaultValue = "PATIENT") String role) {
 
         try {
-            UserDto newUser = userService.createUser(registerDto.getEmail(), registerDto.getPassword(), role);
-            String token = jwtService.generateToken(newUser.getId(), newUser.getEmail(), newUser.getRoles().stream().map(r -> r.getName()).toArray(String[]::new));
+            UserDto newUser = userService.createUser(
+                registerDto.getFirstName(),
+                registerDto.getLastName(),
+                registerDto.getEmail(),
+                registerDto.getPassword(),
+                role
+            );
+            String token = jwtService.generateToken(newUser);
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
             response.put("message", "User registered and logged in successfully.");
@@ -61,8 +66,9 @@ public class AuthenticationController {
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
         );
 
-        User user = userService.getUserByEmail(loginDto.getEmail());
-        String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRoles().stream().map(r -> r.getName()).toArray(String[]::new));
+        UserDto user = userService.getUserDtoByEmail(loginDto.getEmail());
+        String token = jwtService.generateToken(user);
+        System.out.println(token);
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
         response.put("message", "Login successful.");

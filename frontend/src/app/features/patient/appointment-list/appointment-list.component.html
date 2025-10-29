@@ -1,36 +1,161 @@
 <div class="container-fluid py-4">
   <div class="card">
-    <div class="card-header bg-white">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
       <h5 class="mb-0">My Appointments</h5>
+      <button class="btn btn-outline-primary btn-sm" (click)="loadAppointments()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
     </div>
     <div class="card-body">
-      <div class="btn-group mb-3">
-        <button class="btn" [class.btn-primary]="filter==='ALL'" (click)="setFilter('ALL')">All</button>
-        <button class="btn" [class.btn-primary]="filter==='SCHEDULED'" (click)="setFilter('SCHEDULED')">Upcoming</button>
-        <button class="btn" [class.btn-primary]="filter==='COMPLETED'" (click)="setFilter('COMPLETED')">Past</button>
-        <button class="btn" [class.btn-primary]="filter==='CANCELLED'" (click)="setFilter('CANCELLED')">Cancelled</button>
+      <!-- Filter Buttons -->
+      <div class="btn-group mb-4" role="group">
+        <button 
+          class="btn" 
+          [class.btn-primary]="filter === 'ALL'"
+          [class.btn-outline-primary]="filter !== 'ALL'"
+          (click)="setFilter('ALL')">
+          All
+        </button>
+        <button 
+          class="btn" 
+          [class.btn-primary]="filter === AppointmentStatus.BOOKED"
+          [class.btn-outline-primary]="filter !== AppointmentStatus.BOOKED"
+          (click)="setFilter(AppointmentStatus.BOOKED)">
+          Upcoming
+        </button>
+        <button 
+          class="btn" 
+          [class.btn-primary]="filter === AppointmentStatus.COMPLETED"
+          [class.btn-outline-primary]="filter !== AppointmentStatus.COMPLETED"
+          (click)="setFilter(AppointmentStatus.COMPLETED)">
+          Completed
+        </button>
+        <button 
+          class="btn" 
+          [class.btn-primary]="filter === AppointmentStatus.CANCELED"
+          [class.btn-outline-primary]="filter !== AppointmentStatus.CANCELED"
+          (click)="setFilter(AppointmentStatus.CANCELED)">
+          Canceled
+        </button>
       </div>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Doctor</th>
-              <th>Reason</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let apt of filteredAppointments">
-              <td>{{ apt.dateTime | date: 'shortDate' }}</td>
-              <td>{{ apt.dateTime | date: 'shortTime' }}</td>
-              <td>Dr. {{ apt.doctorName }}</td>
-              <td>{{ apt.reason || 'N/A' }}</td>
-              <td><span class="badge bg-primary">{{ apt.status }}</span></td>
-            </tr>
-          </tbody>
-        </table>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading appointments...</p>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!loading">
+        <!-- Empty State -->
+        <div *ngIf="filteredAppointments.length === 0" class="text-center py-5">
+          <i class="bi bi-calendar-x display-1 text-muted"></i>
+          <h5 class="mt-3 text-muted">No Appointments Found</h5>
+          <p class="text-muted" *ngIf="filter === 'ALL'">You don't have any appointments yet.</p>
+          <p class="text-muted" *ngIf="filter !== 'ALL'">
+            No {{getFilterDisplayName(filter)}} appointments found.
+          </p>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div *ngIf="filteredAppointments.length > 0" class="table-responsive d-none d-md-block">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Doctor & Specialty</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let appointment of filteredAppointments" class="appointment-row">
+                <td>
+                  <strong>{{ getAppointmentDate(appointment) | date: 'mediumDate' }}</strong>
+                </td>
+                <td>
+                  {{ getAppointmentTime(appointment) }}
+                </td>
+                <td>
+                  <div class="fw-semibold">Dr. {{ getDoctorName(appointment) }}</div>
+                  <small class="text-muted">{{ getDoctorSpecialty(appointment) }}</small>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(appointment.status)">
+                    {{ appointment.status }}
+                  </span>
+                </td>
+                <td>
+                  <button 
+                    *ngIf="canCancel(appointment)"
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="cancelAppointment(appointment)">
+                    Cancel
+                  </button>
+                  <span *ngIf="!canCancel(appointment) && appointment.status === AppointmentStatus.BOOKED" 
+                        class="text-muted small">
+                    Can cancel up to 24h before
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div *ngIf="filteredAppointments.length > 0" class="d-md-none">
+          <div class="appointment-card mb-3" *ngFor="let appointment of filteredAppointments">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h6 class="card-title mb-0">
+                    Dr. {{ getDoctorName(appointment) }}
+                  </h6>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(appointment.status)">
+                    {{ appointment.status }}
+                  </span>
+                </div>
+                
+                <p class="text-muted small mb-2">{{ getDoctorSpecialty(appointment) }}</p>
+                
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <small class="text-muted">Date:</small>
+                    <div class="fw-semibold">{{ getAppointmentDate(appointment) | date: 'shortDate' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted">Time:</small>
+                    <div class="fw-semibold">{{ getAppointmentDate(appointment) | date: 'shortTime' }}</div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <small class="text-muted">Duration:</small>
+                    <div>{{ getAppointmentTime(appointment) }}</div>
+                  </div>
+                </div>
+
+                <div *ngIf="canCancel(appointment)" class="mt-3">
+                  <button 
+                    class="btn btn-outline-danger btn-sm w-100"
+                    (click)="cancelAppointment(appointment)">
+                    Cancel Appointment
+                  </button>
+                </div>
+                <div *ngIf="!canCancel(appointment) && appointment.status === AppointmentStatus.BOOKED" 
+                     class="mt-2">
+                  <small class="text-muted">
+                    <i class="bi bi-info-circle"></i> Can cancel up to 24 hours before appointment
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -14,6 +14,8 @@ CREATE TABLE roles (
 -- ==========================
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     is_enabled BOOLEAN DEFAULT TRUE NOT NULL,

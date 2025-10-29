@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8070:80"
     networks:
       - cure-connect-network
     depends_on:
@@ -19,26 +19,40 @@ services:
     ports:
       - "8060:8060"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cureconnect
-      - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/cureconnect?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=cureconnect
+      - SPRING_DATASOURCE_PASSWORD=cureconnect
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     networks:
       - cure-connect-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
-    image: postgres:14.1-alpine
+    image: mysql:8.0
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      - POSTGRES_DB=cureconnect
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=cureconnect
+      - MYSQL_USER=cureconnect
+      - MYSQL_PASSWORD=cureconnect
     networks:
       - cure-connect-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   cure-connect-network:
     driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

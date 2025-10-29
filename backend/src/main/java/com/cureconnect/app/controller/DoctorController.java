@@ -53,12 +53,14 @@ public class DoctorController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Doctor> createDoctorProfile(
+            @RequestParam @NotBlank String firstName,
+            @RequestParam @NotBlank String lastName,
             @RequestParam @NotBlank String email,
             @RequestParam @NotBlank String password,
             @RequestParam @NotBlank String licenseId,
             @RequestParam @NotBlank @Size(max = 255) String specialty) {
         
-        Doctor newDoctor = doctorService.createDoctorProfile(email, password, licenseId, specialty);
+        Doctor newDoctor = doctorService.createDoctorProfile(firstName, lastName, email, password, licenseId, specialty);
         return new ResponseEntity<>(newDoctor, HttpStatus.CREATED);
     }
 

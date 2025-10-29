@@ -54,11 +54,13 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> createUser(
+            @RequestParam @NotBlank String firstName,
+            @RequestParam @NotBlank String lastName,
             @RequestParam @NotBlank String email,
             @RequestParam @NotBlank String password,
             @RequestParam(defaultValue = "PATIENT") String defaultRole) {
 
-        UserDto newUser = userService.createUser(email, password, defaultRole);
+        UserDto newUser = userService.createUser(firstName, lastName, email, password, defaultRole);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
@@ -67,10 +69,12 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID id,
             @RequestBody Map<String, Object> requestBody) {
-        Boolean isEnabled = requestBody.containsKey("isEnabled") ? (Boolean) requestBody.get("isEnabled") : null;
+        Boolean enabled = requestBody.containsKey("enabled") ? (Boolean) requestBody.get("enabled") : null;
         String newEmail = (String) requestBody.get("email");
+        String firstName = (String) requestBody.get("firstName");
+        String lastName = (String) requestBody.get("lastName");
 
-        UserDto updatedUser = userService.updateUser(id, isEnabled, newEmail);
+        UserDto updatedUser = userService.updateUser(id, enabled, newEmail, firstName, lastName);
         return ResponseEntity.ok(updatedUser);
     }
 

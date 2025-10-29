@@ -4,13 +4,13 @@
     <div class="card-body">
       <table class="table">
         <thead>
-          <tr><th>Date</th><th>Time</th><th>Patient</th><th>Status</th></tr>
+          <tr><th>Booking Date</th><th>Appointment Date</th><th>Patient</th><th>Status</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let apt of appointments">
-            <td>{{ apt.dateTime | date: 'shortDate' }}</td>
-            <td>{{ apt.dateTime | date: 'shortTime' }}</td>
-            <td>{{ apt.patientName }}</td>
+            <td>{{ apt.slot.updatedAt| date: 'shortDate' }}</td>
+            <td>{{ apt.slot.startTime| date: 'shortTime' }}</td>
+            <td>{{ apt.patient.user.firstName + ' ' + apt.patient.user.lastName}}</td>
             <td><span class="badge bg-primary">{{ apt.status }}</span></td>
           </tr>
         </tbody>

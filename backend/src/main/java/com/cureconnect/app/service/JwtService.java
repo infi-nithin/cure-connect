@@ -4,11 +4,12 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.cureconnect.app.dto.UserDto;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -51,11 +52,13 @@ public class JwtService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String generateToken(UUID userId, String email, String[] roles){
+    public String generateToken(UserDto user){
         Map<String,Object> claims=new HashMap<>();
-        claims.put("userId", userId.toString());
-        claims.put("roles", roles);
-        return createToken(claims, email);
+        claims.put("userId", user.getId().toString());
+        claims.put("firstName", user.getFirstName());
+        claims.put("lastName", user.getLastName());
+        claims.put("roles", user.getRoles().stream().map(r -> r.getName()).toArray(String[]::new));
+        return createToken(claims, user.getEmail());
     }
     
     private String createToken(Map<String, Object> claims, String email) {

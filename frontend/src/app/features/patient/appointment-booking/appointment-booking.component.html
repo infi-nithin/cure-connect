@@ -21,62 +21,150 @@
             </h4>
           </div>
           <div class="card-body">
+            <!-- Progress Bar -->
             <div class="progress mb-4">
               <div class="progress-bar" [style.width.%]="(step / 3) * 100"></div>
             </div>
 
-            <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+            <!-- Error Alert -->
+            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ error }}
+              <button type="button" class="btn-close" (click)="error = ''"></button>
+            </div>
 
+            <!-- Success Alert -->
+            <div *ngIf="successMessage" class="alert alert-success" role="alert">
+              {{ successMessage }}
+            </div>
+
+            <!-- Step 1: Select Doctor -->
             <div *ngIf="step === 1">
               <h5 class="mb-4">Step 1: Select a Doctor</h5>
-              <div class="row g-3">
-                <div class="col-md-4" *ngFor="let doctor of doctors">
-                  <div class="doctor-card" (click)="selectDoctor(doctor)">
-                    <div class="text-center">
-                      <i class="bi bi-person-circle display-4 text-primary"></i>
-                      <h6 class="mt-3 mb-1">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h6>
-                      <p class="text-muted mb-0">{{ doctor.specialization }}</p>
+              
+              <!-- Loading State -->
+              <div *ngIf="loading" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading doctors...</p>
+              </div>
+
+              <!-- Doctors Grid -->
+              <div *ngIf="!loading">
+                <div *ngIf="doctors.length === 0" class="text-center py-5">
+                  <i class="bi bi-person-x display-1 text-muted"></i>
+                  <h5 class="mt-3 text-muted">No Doctors Available</h5>
+                  <p class="text-muted">Please check back later for available doctors.</p>
+                </div>
+
+                <div class="row g-3" *ngIf="doctors.length > 0">
+                  <div class="col-md-6 col-lg-4" *ngFor="let doctor of doctors">
+                    <div class="doctor-card" (click)="selectDoctor(doctor)">
+                      <div class="text-center">
+                        <i class="bi bi-person-circle display-4 text-primary"></i>
+                        <h6 class="mt-3 mb-1">Dr. {{ getDoctorDisplayName(doctor) }}</h6>
+                        <p class="text-muted mb-0">{{ doctor.specialty }}</p>
+                        <small class="text-muted">License: {{ doctor.licenseId }}</small>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
+            <!-- Step 2: Select Slot -->
             <div *ngIf="step === 2">
               <h5 class="mb-4">Step 2: Choose an Available Slot</h5>
-              <p class="text-muted mb-3">Select from available time slots for Dr. {{ selectedDoctor?.firstName }} {{ selectedDoctor?.lastName }}</p>
-              <div class="row g-3">
-                <div class="col-md-4" *ngFor="let slot of availableSlots">
-                  <div class="slot-card" (click)="selectSlot(slot)">
-                    <div class="text-center">
-                      <i class="bi bi-calendar3 text-success fs-2"></i>
-                      <p class="mb-1 mt-2"><strong>{{ slot.startTime | date: 'EEEE' }}</strong></p>
-                      <p class="mb-1">{{ slot.startTime | date: 'shortDate' }}</p>
-                      <p class="mb-0 text-primary"><strong>{{ slot.startTime | date: 'shortTime' }}</strong></p>
+              <p class="text-muted mb-3">
+                Select from available time slots for Dr. {{ getSelectedDoctorName() }}
+              </p>
+              
+              <!-- Loading State -->
+              <div *ngIf="loading" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading available slots...</p>
+              </div>
+
+              <!-- Slots Grid -->
+              <div *ngIf="!loading">
+                <div *ngIf="availableSlots.length === 0" class="text-center py-5">
+                  <i class="bi bi-calendar-x display-1 text-muted"></i>
+                  <h5 class="mt-3 text-muted">No Available Slots</h5>
+                  <p class="text-muted">This doctor doesn't have any available slots at the moment.</p>
+                  <button class="btn btn-outline-primary" (click)="goBack()">
+                    Choose Another Doctor
+                  </button>
+                </div>
+
+                <div class="row g-3" *ngIf="availableSlots.length > 0">
+                  <div class="col-md-6 col-lg-4" *ngFor="let slot of availableSlots">
+                    <div class="slot-card" (click)="selectSlot(slot)">
+                      <div class="text-center">
+                        <i class="bi bi-calendar3 text-success fs-2"></i>
+                        <p class="mb-1 mt-2"><strong>{{ getSlotDate(slot) | date: 'EEEE' }}</strong></p>
+                        <p class="mb-1">{{ getSlotDate(slot) | date: 'mediumDate' }}</p>
+                        <p class="mb-0 text-primary"><strong>{{ formatTimeRange(slot) }}</strong></p>
+                        <small class="text-muted">Time: {{ getSlotDate(slot) | date: 'shortTime' }} - {{ getSlotEndTime(slot) | date: 'shortTime' }}</small>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
+            <!-- Step 3: Confirm Booking -->
             <div *ngIf="step === 3">
               <h5 class="mb-4">Step 3: Confirm Booking</h5>
+              
               <div class="summary-card mb-4">
-                <h6>Appointment Details</h6>
-                <p><strong>Doctor:</strong> Dr. {{ selectedDoctor?.firstName }} {{ selectedDoctor?.lastName }}</p>
-                <p><strong>Specialization:</strong> {{ selectedDoctor?.specialization }}</p>
-                <p><strong>Date:</strong> {{ selectedSlot?.startTime | date: 'fullDate' }}</p>
-                <p><strong>Time:</strong> {{ selectedSlot?.startTime | date: 'shortTime' }}</p>
-              </div>
-              <form [formGroup]="bookingForm" (ngSubmit)="confirmBooking()">
-                <div class="mb-3">
-                  <label class="form-label">Reason for Visit</label>
-                  <textarea class="form-control" rows="3" formControlName="reason"></textarea>
+                <h6 class="border-bottom pb-2">Appointment Details</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Doctor:</strong> Dr. {{ getSelectedDoctorName() }}</p>
+                    <p><strong>Specialty:</strong> {{ getSelectedDoctorSpecialty() }}</p>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Date:</strong> {{ getSelectedSlotDate() ? (getSelectedSlotDate() | date: 'fullDate') : '' }}</p>
+                    <p><strong>Time:</strong> {{ getSelectedSlotTime() }}</p>
+                  </div>
                 </div>
-                <button type="submit" class="btn btn-primary" [disabled]="loading">
-                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                  Confirm Booking
-                </button>
+                <div class="row">
+                  <div class="col-12">
+                    <p><strong>Patient:</strong> {{ getPatientEmail() }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <form [formGroup]="bookingForm" (ngSubmit)="confirmBooking()">
+                <div class="mb-4">
+                  <label class="form-label"><strong>Reason for Visit</strong></label>
+                  <textarea 
+                    class="form-control" 
+                    rows="3" 
+                    formControlName="reason"
+                    placeholder="Please describe the reason for your visit..."
+                  ></textarea>
+                  <div *ngIf="bookingForm.get('reason')?.invalid && bookingForm.get('reason')?.touched" 
+                       class="text-danger small mt-1">
+                    Reason for visit is required
+                  </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button type="button" class="btn btn-outline-secondary me-md-2" (click)="goBack()">
+                    Back
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary" 
+                    [disabled]="bookingForm.invalid || loading"
+                  >
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ loading ? 'Booking...' : 'Confirm Booking' }}
+                  </button>
+                </div>
               </form>
             </div>
           </div>

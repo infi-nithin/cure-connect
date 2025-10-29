@@ -1,56 +1,95 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ApiService } from '../../../core/services/api.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { AuthService } from "../../../core/services/auth.service";
+import { AdminStats } from "../../../core/models/adminStats.model";
+import { DetailedAdminStats } from "../../../core/models/detailedAdminStats.model";
+import { User } from "../../../core/models/user.model";
+import { AdminService } from "../../../core/services/admin.service";
 
 @Component({
-  selector: 'app-admin-dashboard',
-  templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.scss']
+  selector: "app-admin-dashboard",
+  templateUrl: "./admin-dashboard.component.html",
+  styleUrls: ["./admin-dashboard.component.scss"],
 })
 export class AdminDashboardComponent implements OnInit {
-  stats = {
+  stats: AdminStats = {
     totalUsers: 0,
     totalDoctors: 0,
     totalPatients: 0,
-    totalAppointments: 0
+    totalAppointments: 0,
   };
+  detailedStats: DetailedAdminStats | null = null;
   loading = true;
-  currentUser: any;
+  currentUser: User | null;
+  currentTime = new Date();
 
   constructor(
-    private apiService: ApiService,
+    private adminService: AdminService,
     private authService: AuthService,
     private router: Router
   ) {
-    this.currentUser = this.authService.currentUserValue;
+    this.currentUser = this.authService.getCurrentUser();
   }
 
   ngOnInit(): void {
     this.loadDashboardStats();
+
+    // Update time every minute
+    setInterval(() => {
+      this.currentTime = new Date();
+    }, 60000);
   }
 
   loadDashboardStats(): void {
     this.loading = true;
-    
-    this.apiService.get<any>('/admin/stats').subscribe({
+
+    this.adminService.getStats().subscribe({
       next: (stats) => {
         this.stats = stats;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading stats:', error);
+        console.error("Error loading stats:", error);
         this.loading = false;
-      }
+      },
     });
   }
 
-  manageUsers(): void {
-    this.router.navigate(['/admin/users']);
+  loadDetailedStats(): void {
+    this.adminService.getDetailedStats().subscribe({
+      next: (detailedStats) => {
+        this.detailedStats = detailedStats;
+        // You can display this in a modal or separate page
+        console.log('Detailed Stats:', detailedStats);
+      },
+      error: (error) => {
+        console.error("Error loading detailed stats:", error);
+      },
+    });
+  }
+
+  getCurrentUserName(): string {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      return "";
+    }
+    return `${user.firstName} ${user.lastName}`.trim();
+  }
+
+  goToUserManagement(): void {
+    this.router.navigate(['/admin', 'users']);
+  }
+
+  goToDoctorManagement(): void {
+    this.router.navigate(['/admin', 'doctors']);
+  }
+
+  goToStatistics(): void {
+    this.router.navigate(['/admin', 'stats']);
   }
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(["/auth/login"]);
   }
 }

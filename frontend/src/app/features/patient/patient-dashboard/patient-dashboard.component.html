@@ -8,7 +8,7 @@
       <div class="d-flex align-items-center">
         <span class="me-3">
           <i class="bi bi-person-circle"></i>
-          {{ currentUser?.firstName }} {{ currentUser?.lastName }}
+          {{ currentUser?.email }}
         </span>
         <button class="btn btn-outline-danger btn-sm" (click)="logout()">
           <i class="bi bi-box-arrow-right"></i> Logout
@@ -21,7 +21,7 @@
     <div class="row mb-4">
       <div class="col-12">
         <h2 class="mb-0">Patient Dashboard</h2>
-        <p class="text-muted">Welcome back, {{ currentUser?.firstName }}!</p>
+        <p class="text-muted">Welcome back, {{ currentUser?.email }}!</p>
       </div>
     </div>
 
@@ -54,7 +54,7 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  <h6 class="text-muted mb-1">Active Prescriptions</h6>
+                  <h6 class="text-muted mb-1">Recent Prescriptions</h6>
                   <h3 class="mb-0">{{ recentPrescriptions.length }}</h3>
                 </div>
                 <div class="stat-icon bg-success">
@@ -95,25 +95,34 @@
                 <div class="appointment-card">
                   <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                      <h6 class="mb-1">Dr. {{ nextAppointment.doctorName }}</h6>
+                      <h6 class="mb-1">Dr. {{ getDoctorName(nextAppointment) }}</h6>
                       <p class="text-muted mb-0">
-                        <small>{{ nextAppointment.doctorSpecialization }}</small>
+                        <small>{{ getDoctorSpecialty(nextAppointment) }}</small>
                       </p>
                     </div>
-                    <span class="badge bg-primary">{{ nextAppointment.status }}</span>
+                    <span 
+                      class="badge" 
+                      [ngClass]="{
+                        'bg-primary': nextAppointment.status === 'BOOKED',
+                        'bg-success': nextAppointment.status === 'COMPLETED',
+                        'bg-danger': nextAppointment.status === 'CANCELED'
+                      }">
+                      {{ nextAppointment.status }}
+                    </span>
                   </div>
                   <div class="appointment-details">
                     <p class="mb-2">
                       <i class="bi bi-calendar3 text-primary"></i>
-                      {{ nextAppointment.dateTime | date: 'fullDate' }}
+                      {{ getAppointmentDateTime(nextAppointment) | date: 'fullDate' }}
                     </p>
                     <p class="mb-2">
                       <i class="bi bi-clock text-primary"></i>
-                      {{ nextAppointment.dateTime | date: 'shortTime' }}
+                      {{ getAppointmentDateTime(nextAppointment) | date: 'shortTime' }}
                     </p>
-                    <p class="mb-0" *ngIf="nextAppointment.reason">
-                      <i class="bi bi-chat-left-text text-primary"></i>
-                      {{ nextAppointment.reason }}
+                    <p class="mb-0">
+                      <i class="bi bi-clock-history text-primary"></i>
+                      {{ getAppointmentDateTime(nextAppointment) | date: 'shortTime' }} - 
+                      {{ nextAppointment.slot.endTime | date: 'shortTime' }}
                     </p>
                   </div>
                 </div>
@@ -146,20 +155,24 @@
                 <div class="prescription-item" *ngFor="let prescription of recentPrescriptions">
                   <div class="d-flex justify-content-between">
                     <div>
-                      <h6 class="mb-1">{{ prescription.medication }}</h6>
+                      <h6 class="mb-1">{{ getMedicationNames(prescription) }}</h6>
                       <p class="text-muted mb-1">
-                        <small>Prescribed by Dr. {{ prescription.doctorName }}</small>
+                        <small>Prescribed by Dr. {{ getPrescriptionDoctorName(prescription) }}</small>
                       </p>
-                      <p class="mb-0">
-                        <small>
-                          <strong>Dosage:</strong> {{ prescription.dosage }} | 
-                          <strong>Duration:</strong> {{ prescription.duration }}
-                        </small>
+                      <p class="mb-1" *ngIf="prescription.dosage">
+                        <small><strong>Dosage:</strong> {{ prescription.dosage }}</small>
+                      </p>
+                      <p class="mb-0" *ngIf="prescription.instructions">
+                        <small><strong>Instructions:</strong> {{ prescription.instructions }}</small>
                       </p>
                     </div>
                     <div class="text-end">
                       <small class="text-muted">
-                        {{ prescription.prescribedDate | date: 'shortDate' }}
+                        {{ prescription.createdAt | date: 'shortDate' }}
+                      </small>
+                      <br>
+                      <small class="text-muted">
+                        {{ prescription.medicines.length }} medicine(s)
                       </small>
                     </div>
                   </div>

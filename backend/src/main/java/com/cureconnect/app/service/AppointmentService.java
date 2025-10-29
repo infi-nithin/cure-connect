@@ -29,6 +29,7 @@ public class AppointmentService {
     private final SlotRepository slotRepository;
     private final PatientRepository patientRepository;
     private final EntityManager entityManager;
+    private final EmailService emailService;
 
     @Transactional
     public Appointment createAppointment(UUID patientId, UUID slotId) {
@@ -57,26 +58,24 @@ public class AppointmentService {
         appointment.setSlot(slot);
         appointment.setStatus(AppointmentStatus.BOOKED);
 
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+        emailService.sendAppointmentConfirmation(savedAppointment);
+        return savedAppointment;
     }
 
-    @Transactional(readOnly = true)
     public Appointment getAppointmentById(UUID id) {
         return appointmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
     }
 
-    @Transactional(readOnly = true)
     public List<Appointment> getAppointmentsByPatient(UUID patientId) {
         return appointmentRepository.findByPatientId(patientId);
     }
 
-    @Transactional(readOnly = true)
     public List<Appointment> getAppointmentsByDoctor(UUID doctorId) {
         return appointmentRepository.findBySlotDoctorId(doctorId);
     }
 
-    @Transactional(readOnly = true)
     public List<Appointment> getAppointmentsByPatientAndStatus(UUID patientId, AppointmentStatus status) {
         return appointmentRepository.findByPatientIdAndStatus(patientId, status);
     }
@@ -98,7 +97,9 @@ public class AppointmentService {
         slotRepository.save(slot);
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+        emailService.sendAppointmentCancellation(savedAppointment);
+        return savedAppointment;
     }
 
     @Transactional

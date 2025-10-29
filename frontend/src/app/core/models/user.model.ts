@@ -1,30 +1,34 @@
+import { Role } from "./role.model";
+
 export interface User {
-  id: number;
-  email: string;
+  id: string;
   firstName: string;
   lastName: string;
-  role: 'PATIENT' | 'DOCTOR' | 'ADMIN';
-  phone?: string;
-  specialization?: string;
-  createdAt?: Date;
+  email: string;
+  enabled: boolean;
+  createdAt: Date;
+  roles: Role[];
 }
 
-export interface LoginRequest {
+export interface LoginDto {
   email: string;
   password: string;
 }
 
-export interface RegisterRequest {
-  email: string;
-  password: string;
+export interface RegisterDto {
   firstName: string;
   lastName: string;
-  role: 'PATIENT' | 'DOCTOR';
-  phone?: string;
-  specialization?: string;
+  email: string;
+  password: string;
+  phoneNumber?: string;
 }
 
-export interface AuthResponse {
-  token: string;
-  user: User;
+export interface UserDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  enabled: boolean;
+  createdAt: Date;
+  roles: Role[];
 }

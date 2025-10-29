@@ -1,8 +1,32 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
+import { inject, NgModule } from '@angular/core';
+import { CanActivateFn, RouterModule, Router, Routes } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
+
+const canActivateWithRole: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const expectedRole = route.data['role'];
+
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+    return false;
+  }
+
+  if (expectedRole && !authService.hasRole(expectedRole)) {
+    console.log("PATIENT");
+    router.navigate(['/auth/login']);
+    return false;
+  }
+
+  return true;
+};
 
 const routes: Routes = [
+  {
+    path:"",
+    redirectTo:"/auth/login",
+    pathMatch:"full"
+  },
   {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
@@ -10,19 +34,19 @@ const routes: Routes = [
   {
     path: 'patient',
     loadChildren: () => import('./features/patient/patient.module').then(m => m.PatientModule),
-    canActivate: [AuthGuard],
+    canActivate: [canActivateWithRole],
     data: { role: 'PATIENT' }
   },
   {
     path: 'doctor',
     loadChildren: () => import('./features/doctor/doctor.module').then(m => m.DoctorModule),
-    canActivate: [AuthGuard],
+    canActivate: [canActivateWithRole],
     data: { role: 'DOCTOR' }
   },
   {
     path: 'admin',
     loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
-    canActivate: [AuthGuard],
+    canActivate: [canActivateWithRole],
     data: { role: 'ADMIN' }
   },
   {

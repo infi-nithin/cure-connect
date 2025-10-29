@@ -44,7 +44,7 @@ public class PatientService {
     }
 
     @Transactional
-    public Patient createPatientProfile(String email, String password, LocalDate dob, String phoneNumber) {
+    public Patient createPatientProfile(String firstName, String lastName, String email, String password, LocalDate dob, String phoneNumber) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new InvalidRequestException("User with email already exists: " + email);
         }
@@ -53,6 +53,8 @@ public class PatientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Required Role PATIENT not found in database."));
 
         User newUser = new User();
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
         newUser.setEmail(email);
         newUser.setPasswordHash(bCryptUtils.hashPassword(password));
         newUser.setRoles(Collections.singletonList(patientRole));

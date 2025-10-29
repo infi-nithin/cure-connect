@@ -43,7 +43,7 @@ public class Slot {
     @Column(name = "is_booked", nullable = false)
     private boolean isBooked;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 

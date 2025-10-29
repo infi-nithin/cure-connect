@@ -1,30 +1,129 @@
 <div class="container-fluid py-4">
   <div class="card">
-    <div class="card-header bg-white">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
       <h5 class="mb-0">My Prescriptions</h5>
+      <button class="btn btn-outline-primary btn-sm" (click)="loadPrescriptions()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Medication</th>
-              <th>Dosage</th>
-              <th>Duration</th>
-              <th>Doctor</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let p of prescriptions">
-              <td>{{ p.medication }}</td>
-              <td>{{ p.dosage }}</td>
-              <td>{{ p.duration }}</td>
-              <td>Dr. {{ p.doctorName }}</td>
-              <td>{{ p.prescribedDate | date: 'shortDate' }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading prescriptions...</p>
+      </div>
+
+      <div *ngIf="!loading">
+        <div *ngIf="prescriptions.length === 0" class="text-center py-5">
+          <i class="bi bi-file-medical display-1 text-muted"></i>
+          <h5 class="mt-3 text-muted">No Prescriptions Found</h5>
+          <p class="text-muted">You don't have any prescriptions yet.</p>
+        </div>
+
+        <div *ngIf="prescriptions.length > 0" class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Medications</th>
+                <th>Dosage</th>
+                <th>Instructions</th>
+                <th>Doctor</th>
+                <th>Date Prescribed</th>
+                <th>Items</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let prescription of prescriptions" class="prescription-row">
+                <td>
+                  <strong>{{ getMedicationNames(prescription) }}</strong>
+                  <div *ngIf="prescription.medicines.length > 1" class="text-muted small">
+                    {{ prescription.medicines.length }} medications
+                  </div>
+                </td>
+                <td>
+                  <span *ngIf="prescription.dosage; else noDosage">{{ prescription.dosage }}</span>
+                  <ng-template #noDosage><span class="text-muted">-</span></ng-template>
+                </td>
+                <td>
+                  <span *ngIf="prescription.instructions; else noInstructions" 
+                        class="instruction-text">
+                    {{ prescription.instructions }}
+                  </span>
+                  <ng-template #noInstructions><span class="text-muted">-</span></ng-template>
+                </td>
+                <td>
+                  <div>Dr. {{ getDoctorName(prescription) }}</div>
+                  <small class="text-muted">{{ prescription.doctor.specialty }}</small>
+                </td>
+                <td>
+                  {{ prescription.createdAt | date: 'mediumDate' }}
+                  <div class="text-muted small">
+                    {{ prescription.createdAt | date: 'shortTime' }}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-primary rounded-pill">
+                    {{ prescription.medicines.length }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Detailed view for smaller screens or as expandable rows -->
+        <div *ngIf="prescriptions.length > 0" class="d-md-none">
+          <div class="prescription-card mb-3" *ngFor="let prescription of prescriptions">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title">{{ getMedicationNames(prescription) }}</h6>
+                
+                <div class="row mb-2">
+                  <div class="col-6">
+                    <small class="text-muted">Dosage:</small>
+                    <div>{{ prescription.dosage || '-' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted">Doctor:</small>
+                    <div>Dr. {{ getDoctorName(prescription) }}</div>
+                  </div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-12">
+                    <small class="text-muted">Instructions:</small>
+                    <div class="instruction-text">{{ prescription.instructions || '-' }}</div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-6">
+                    <small class="text-muted">Date:</small>
+                    <div>{{ prescription.createdAt | date: 'shortDate' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted">Items:</small>
+                    <div>
+                      <span class="badge bg-primary">{{ prescription.medicines.length }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="prescription.medicines.length > 0" class="mt-3">
+                  <small class="text-muted d-block mb-1">Medication Details:</small>
+                  <div class="medicine-details">
+                    <div *ngFor="let pm of prescription.medicines" class="small text-muted">
+                      • {{ pm.medicine.name }}
+                      <span *ngIf="pm.medicine.dosageForm">({{ pm.medicine.dosageForm }})</span>
+                      - Quantity: {{ pm.quantity }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

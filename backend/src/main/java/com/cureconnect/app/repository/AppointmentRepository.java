@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.cureconnect.app.entity.Appointment;
@@ -20,4 +21,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     List<Appointment> findByPatientIdAndStatus(UUID patientId, AppointmentStatus status);
 
     List<Appointment> findBySlotDoctorId(UUID doctorId);
+
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.status = 'BOOKED'")
+    Long countActiveAppointments();
+
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.status = 'COMPLETED'")
+    Long countCompletedAppointments();
+
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.status = 'CANCELLED'")
+    Long countCancelledAppointments();
 }

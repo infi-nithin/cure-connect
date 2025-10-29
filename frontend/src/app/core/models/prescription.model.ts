@@ -1,15 +1,13 @@
+import { Patient } from './patient.model';
+import { Doctor } from './doctor.model';
+import { PrescriptionMedicine } from './prescription-medicine.model';
+
 export interface Prescription {
-  id: number;
-  appointmentId: number;
-  patientId: number;
-  patientName: string;
-  doctorId: number;
-  doctorName: string;
-  medication: string;
-  dosage: string;
-  duration: string;
+  id: string; 
+  patient: Patient;
+  doctor: Doctor;
+  dosage?: string;
   instructions?: string;
-  notes?: string;
-  prescribedDate: Date;
-  createdAt?: Date;
+  createdAt: Date;
+  medicines: PrescriptionMedicine[];
 }

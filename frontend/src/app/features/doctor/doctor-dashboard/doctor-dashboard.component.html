@@ -1,14 +1,14 @@
 <div class="dashboard-wrapper">
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" routerLink="/doctor/dashboard">
         <i class="bi bi-hospital text-primary"></i>
         <strong>Cure Connect</strong>
       </a>
       <div class="d-flex align-items-center">
         <span class="me-3">
           <i class="bi bi-person-circle"></i>
-          Dr. {{ currentUser?.firstName }} {{ currentUser?.lastName }}
+          Dr. {{ getCurrentUserName() }}
         </span>
         <button class="btn btn-outline-danger btn-sm" (click)="logout()">
           <i class="bi bi-box-arrow-right"></i> Logout
@@ -21,14 +21,23 @@
     <div class="row mb-4">
       <div class="col-12">
         <h2 class="mb-0">Doctor Dashboard</h2>
-        <p class="text-muted">Welcome back, Dr. {{ currentUser?.firstName }}!</p>
+        <p class="text-muted">Welcome back, Dr. {{ getCurrentUserName() }}!</p>
+        <p class="text-muted mb-0">
+          <small>Specialty: {{ getDoctorSpecialty() }} | License: {{ getDoctorLicense() }}</small>
+        </p>
       </div>
     </div>
 
-    <div *ngIf="loading" class="loading-spinner">
+    <div *ngIf="loading" class="loading-spinner text-center py-4">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
+      <p class="mt-2 text-muted">Loading dashboard data...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
     </div>
 
     <div *ngIf="!loading">
@@ -54,8 +63,8 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  <h6 class="text-muted mb-1">Pending Requests</h6>
-                  <h3 class="mb-0">{{ pendingAppointments.length }}</h3>
+                  <h6 class="text-muted mb-1">Upcoming Appointments</h6>
+                  <h3 class="mb-0">{{ upcomingAppointments.length }}</h3>
                 </div>
                 <div class="stat-icon bg-warning">
                   <i class="bi bi-clock-history"></i>
@@ -85,46 +94,71 @@
       <div class="row g-4">
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-white">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
               <h5 class="mb-0">
-                <i class="bi bi-calendar-check"></i> Today's Schedule
+                <i class="bi bi-calendar-check text-primary"></i> Today's Schedule
               </h5>
+              <button class="btn btn-outline-primary btn-sm" (click)="viewAppointments()">
+                <i class="bi bi-list-ul me-1"></i> View All Appointments
+              </button>
             </div>
             <div class="card-body">
               <div *ngIf="todayAppointments.length > 0; else noAppointments">
                 <div class="table-responsive">
                   <table class="table table-hover">
-                    <thead>
+                    <thead class="table-light">
                       <tr>
                         <th>Time</th>
                         <th>Patient</th>
-                        <th>Reason</th>
+                        <th>Contact</th>
+                        <th>Duration</th>
                         <th>Status</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr *ngFor="let appointment of todayAppointments">
-                        <td>{{ appointment.dateTime | date: 'shortTime' }}</td>
-                        <td>{{ appointment.patientName }}</td>
-                        <td>{{ appointment.reason || 'General checkup' }}</td>
+                      <tr *ngFor="let appointment of todayAppointments" class="appointment-row">
                         <td>
-                          <span class="badge" 
-                            [class.bg-success]="appointment.status === 'SCHEDULED'"
-                            [class.bg-warning]="appointment.status === 'PENDING'"
-                            [class.bg-secondary]="appointment.status === 'COMPLETED'">
+                          <strong>{{ getAppointmentTime(appointment) | date: 'shortTime' }}</strong>
+                        </td>
+                        <td>
+                          <div class="fw-semibold">{{ getPatientName(appointment) }}</div>
+                          <small class="text-muted" *ngIf="getPatientDOB(appointment)">
+                            DOB: {{ getPatientDOB(appointment) | date: 'shortDate' }}
+                          </small>
+                          <small class="text-muted" *ngIf="!getPatientDOB(appointment)">
+                            DOB: Not available
+                          </small>
+                        </td>
+                        <td>
+                          <small [class.text-muted]="!appointment.patient.phoneNumber">
+                            {{ getPatientPhoneNumber(appointment) }}
+                          </small>
+                        </td>
+                        <td>
+                          <small>
+                            {{ getAppointmentTime(appointment) | date: 'shortTime' }} - 
+                            {{ getAppointmentEndTime(appointment) | date: 'shortTime' }}
+                          </small>
+                        </td>
+                        <td>
+                          <span class="badge" [ngClass]="getStatusBadgeClass(appointment.status)">
                             {{ appointment.status }}
                           </span>
                         </td>
                         <td>
-                          <button class="btn btn-sm btn-primary me-2" 
-                            [routerLink]="['/doctor/notes', appointment.id]">
-                            <i class="bi bi-pencil"></i> Notes
-                          </button>
-                          <button class="btn btn-sm btn-info" 
-                            [routerLink]="['/doctor/chat', appointment.id]">
-                            <i class="bi bi-chat"></i> Chat
-                          </button>
+                          <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" 
+                                    (click)="viewMedicalNotes(appointment)"
+                                    title="Medical Notes">
+                              <i class="bi bi-file-medical"></i>
+                            </button>
+                            <button class="btn btn-outline-info" 
+                                    (click)="startChat(appointment)"
+                                    title="Chat with Patient">
+                              <i class="bi bi-chat"></i>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     </tbody>
@@ -135,8 +169,65 @@
                 <div class="text-center py-5">
                   <i class="bi bi-calendar-x display-1 text-muted"></i>
                   <p class="text-muted mt-3">No appointments scheduled for today</p>
+                  <button class="btn btn-primary" (click)="manageSlots()">
+                    <i class="bi bi-plus-circle me-1"></i> Manage Availability
+                  </button>
                 </div>
               </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Appointments Section -->
+      <div class="row g-4 mt-2" *ngIf="upcomingAppointments.length > 0">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">
+                <i class="bi bi-calendar-week text-primary"></i> Upcoming Appointments
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6 col-lg-4" *ngFor="let appointment of upcomingAppointments.slice(0, 3)">
+                  <div class="appointment-card">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <h6 class="card-title mb-0">{{ getPatientName(appointment) }}</h6>
+                          <span class="badge" [ngClass]="getStatusBadgeClass(appointment.status)">
+                            {{ appointment.status }}
+                          </span>
+                        </div>
+                        <p class="text-muted small mb-2">
+                          {{ getAppointmentTime(appointment) | date: 'fullDate' }}
+                        </p>
+                        <p class="mb-3">
+                          <i class="bi bi-clock text-primary me-1"></i>
+                          {{ getAppointmentTime(appointment) | date: 'shortTime' }} - 
+                          {{ getAppointmentEndTime(appointment) | date: 'shortTime' }}
+                        </p>
+                        <div class="btn-group w-100" role="group">
+                          <button class="btn btn-outline-primary btn-sm" 
+                                  (click)="viewMedicalNotes(appointment)">
+                            <i class="bi bi-file-medical"></i> Notes
+                          </button>
+                          <button class="btn btn-outline-info btn-sm" 
+                                  (click)="startChat(appointment)">
+                            <i class="bi bi-chat"></i> Chat
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center mt-3" *ngIf="upcomingAppointments.length > 3">
+                <button class="btn btn-outline-primary" (click)="viewAppointments()">
+                  View All {{ upcomingAppointments.length }} Upcoming Appointments
+                </button>
+              </div>
             </div>
           </div>
         </div>

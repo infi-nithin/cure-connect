@@ -56,12 +56,14 @@ public class PatientController {
 
     @PostMapping("/register")
     public ResponseEntity<Patient> createPatientProfile(
+            @RequestParam @NotBlank String firstName,
+            @RequestParam @NotBlank String lastName,
             @RequestParam @NotBlank String email,
             @RequestParam @NotBlank String password,
-            @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dob, // Use ISO format for date
+            @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dob,
             @RequestParam(required = false) String phoneNumber) {
 
-        Patient newPatient = patientService.createPatientProfile(email, password, dob, phoneNumber);
+        Patient newPatient = patientService.createPatientProfile(firstName, lastName, email, password, dob, phoneNumber);
         return new ResponseEntity<>(newPatient, HttpStatus.CREATED);
     }
 

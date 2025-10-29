@@ -39,7 +39,7 @@ public class Doctor {
     @Column(name = "license_id", length = 100, unique = true, nullable = false)
     private String licenseId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 }

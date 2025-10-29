@@ -40,7 +40,7 @@ public class Patient {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 }

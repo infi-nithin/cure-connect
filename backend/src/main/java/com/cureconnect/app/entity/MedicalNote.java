@@ -31,14 +31,14 @@ public class MedicalNote {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "appointment_id", referencedColumnName = "id", nullable = false, unique = true)
     private Appointment appointment;
 
     @Column(name = "notes_text", columnDefinition = "TEXT")
     private String notesText;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "updated_by")
     private Doctor updatedBy;
 

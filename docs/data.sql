@@ -3,12 +3,12 @@ INSERT INTO roles (name) VALUES
 ('ADMIN'), ('DOCTOR'), ('PATIENT');
 
 -- USERS
-INSERT INTO users (email, password_hash, is_enabled) VALUES
-('admin@cureconnect.com', '$2a$10$G9H6fdTGogHzwMMf7pzvcODqEg0IPcRTY7afChWUdP.IJlh6sHf4e', TRUE),
-('dr.smith@cureconnect.com', '$2a$10$SWZM3WGLZMIP0MCKmM9c9uRLvkeCpMK1Ly66nPlAy5nRntFwpPpCy', TRUE),
-('dr.jones@cureconnect.com', '$2a$10$SWZM3WGLZMIP0MCKmM9c9uRLvkeCpMK1Ly66nPlAy5nRntFwpPpCy', TRUE),
-('john.doe@cureconnect.com', '$2a$10$2VbQHRc6.fcIxx/lVuXZ0OGxEGC6qnJKNkaocMg8VRST73azkjkAu', TRUE),
-('jane.doe@cureconnect.com', '$2a$10$2VbQHRc6.fcIxx/lVuXZ0OGxEGC6qnJKNkaocMg8VRST73azkjkAu', TRUE);
+INSERT INTO users (first_name, last_name, email, password_hash, is_enabled) VALUES
+('Nithin', 'Mouli', 'admin@cureconnect.com', '$2y$10$UCa6UJFli2l3wLUSWe158uitSe9O90LO7lnVtdgisdAE2wO9vJ9XW', TRUE),
+('Elana', 'Smith', 'dr.smith@cureconnect.com', '$2y$10$UCa6UJFli2l3wLUSWe158uitSe9O90LO7lnVtdgisdAE2wO9vJ9XW', TRUE),
+('William', 'Jones', 'dr.jones@cureconnect.com', '$2y$10$UCa6UJFli2l3wLUSWe158uitSe9O90LO7lnVtdgisdAE2wO9vJ9XW', TRUE),
+('John', 'Doe', 'john.doe@cureconnect.com', '$2y$10$UCa6UJFli2l3wLUSWe158uitSe9O90LO7lnVtdgisdAE2wO9vJ9XW', TRUE),
+('Jane', 'Doe', 'jane.doe@cureconnect.com', '$2y$10$UCa6UJFli2l3wLUSWe158uitSe9O90LO7lnVtdgisdAE2wO9vJ9XW', TRUE);
 
 -- USER_ROLES
 INSERT INTO user_roles (user_id, role_id)

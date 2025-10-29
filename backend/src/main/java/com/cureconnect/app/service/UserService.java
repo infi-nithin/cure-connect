@@ -1,6 +1,5 @@
 package com.cureconnect.app.service;
 
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -55,7 +54,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto createUser(String email, String password, String defaultRoleName) {
+    public UserDto createUser(String firstName, String lastName, String email, String password, String defaultRoleName) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new InvalidRequestException("User with email already exists: " + email);
         }
@@ -64,6 +63,8 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Required Role " + defaultRoleName + " not found in database."));
         
         User newUser = new User();
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
         newUser.setEmail(email);
         newUser.setPasswordHash(bCryptUtils.hashPassword(password));
         newUser.setRoles(Collections.singletonList(defaultRole));
@@ -74,12 +75,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(UUID id, Boolean isEnabled, String newEmail) {
+    public UserDto updateUser(UUID id, Boolean enabled, String newEmail, String firstName, String lastName) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        if (isEnabled != null) {
-            user.setEnabled(isEnabled);
+        if (enabled != null) {
+            user.setEnabled(enabled);
         }
         
         if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
@@ -87,6 +88,14 @@ public class UserService {
                 throw new InvalidRequestException("User with new email already exists: " + newEmail);
             }
             user.setEmail(newEmail);
+        }
+
+        if (firstName != null && !firstName.isBlank()) {
+            user.setFirstName(firstName);
+        }
+
+        if (lastName != null && !lastName.isBlank()) {
+            user.setLastName(lastName);
         }
         
         User updatedUser = userRepository.save(user);

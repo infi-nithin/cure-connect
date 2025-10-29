@@ -1,49 +1,225 @@
-<div class="container-fluid py-4">
-  <div class="card">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">User Management</h5>
-      <button class="btn btn-primary" (click)="showModal = true">Add User</button>
-    </div>
-    <div class="card-body">
-      <table class="table">
-        <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let user of users">
-            <td>{{ user.firstName }} {{ user.lastName }}</td>
-            <td>{{ user.email }}</td>
-            <td><span class="badge bg-primary">{{ user.role }}</span></td>
-          </tr>
-        </tbody>
-      </table>
+<!-- Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/admin/dashboard">
+      <i class="bi bi-hospital text-primary"></i>
+      <strong>Cure Connect</strong>
+    </a>
+    <div class="d-flex align-items-center">
+      <span class="me-3">
+        <i class="bi bi-person-circle"></i>
+        {{ getCurrentUserName() }} (Admin)
+      </span>
+      <button class="btn btn-outline-danger btn-sm" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
     </div>
   </div>
-  
-  <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Create User</h5>
-          <button type="button" class="btn-close" (click)="showModal = false"></button>
+</nav>
+
+<!-- Page Content -->
+<div class="container-fluid py-4">
+  <!-- Back Button and Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <button class="btn btn-outline-secondary btn-sm me-3" (click)="goBack()">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <h2 class="mb-0 d-inline-block">
+            <i class="bi bi-people-fill text-primary me-2"></i>
+            Patient Management
+          </h2>
         </div>
-        <div class="modal-body">
-          <form [formGroup]="userForm">
-            <div class="mb-3"><input type="text" class="form-control" formControlName="firstName" placeholder="First Name"></div>
-            <div class="mb-3"><input type="text" class="form-control" formControlName="lastName" placeholder="Last Name"></div>
-            <div class="mb-3"><input type="email" class="form-control" formControlName="email" placeholder="Email"></div>
-            <div class="mb-3">
-              <select class="form-select" formControlName="role">
-                <option value="PATIENT">Patient</option>
-                <option value="DOCTOR">Doctor</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
-          </form>
+      </div>
+      <p class="text-muted mt-2">Manage patient accounts and profiles</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0">
+          <i class="bi bi-list-ul text-primary me-2"></i>
+          Patients List
+        </h5>
+        <p class="text-muted mb-0 mt-1">{{ patients.length }} patient(s) registered</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Error Alert -->
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = ''"></button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading && patients.length === 0" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="showModal = false">Close</button>
-          <button type="button" class="btn btn-primary" (click)="createUser()">Create</button>
+        <p class="mt-2 text-muted">Loading patients...</p>
+      </div>
+
+      <!-- Patients Table -->
+      <div *ngIf="!loading || patients.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Patient Details</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Registered</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let patient of patients" class="patient-row">
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-person-circle me-3 text-primary fs-4"></i>
+                  <div>
+                    <div class="fw-semibold">
+                      {{ patient.user.firstName }} {{ patient.user.lastName }}
+                    </div>
+                    <div class="text-muted small">{{ patient.user.email }}</div>
+                    <small class="text-muted">DOB: {{ patient.dob | date : "mediumDate" }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div *ngIf="patient.phoneNumber" class="text-nowrap">
+                  <i class="bi bi-telephone me-1 text-muted"></i>
+                  {{ patient.phoneNumber }}
+                </div>
+                <div *ngIf="!patient.phoneNumber" class="text-muted">
+                  <small>No phone</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [class.bg-success]="patient.user.enabled" [class.bg-danger]="!patient.user.enabled">
+                  {{ patient.user.enabled ? "Active" : "Disabled" }}
+                </span>
+              </td>
+              <td>
+                <small class="text-muted">
+                  {{ patient.user.createdAt | date : "mediumDate" }}
+                </small>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-primary" 
+                          (click)="togglePatientStatus(patient)"
+                          [title]="patient.user.enabled ? 'Disable Patient' : 'Enable Patient'">
+                    <i class="bi" [class.bi-person-check]="patient.user.enabled" [class.bi-person-x]="!patient.user.enabled"></i>
+                  </button>
+                  <button class="btn btn-outline-warning" 
+                          (click)="resetPassword(patient.user)"
+                          title="Reset Password">
+                    <i class="bi bi-key"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div *ngIf="patients.length === 0 && !loading" class="text-center py-5">
+          <i class="bi bi-person display-1 text-muted"></i>
+          <h5 class="mt-3 text-muted">No Patients Found</h5>
+          <p class="text-muted">Get started by registering your first patient.</p>
+          <button class="btn btn-primary" (click)="showModal = true">
+            <i class="bi bi-person-plus me-1"></i> Add Patient
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Create Patient Modal -->
+<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1" [attr.aria-hidden]="!showModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-person-plus text-primary me-2"></i>
+          Register New Patient
+        </h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="patientForm">
+          <!-- Name Fields -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" formControlName="firstName" placeholder="John" />
+              <div *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched" class="invalid-feedback d-block">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                First name is required
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" formControlName="lastName" placeholder="Doe" />
+              <div *ngIf="patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched" class="invalid-feedback d-block">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                Last name is required
+              </div>
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" formControlName="email" placeholder="patient@example.com" />
+            <div *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched" class="invalid-feedback d-block">
+              <i class="bi bi-exclamation-circle me-1"></i>
+              Please enter a valid email address
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="mb-3">
+            <label class="form-label">Phone Number <small class="text-muted">(Optional)</small></label>
+            <input type="tel" class="form-control" formControlName="phoneNumber" placeholder="+1 (555) 000-0000" />
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="mb-3">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" formControlName="dob" />
+            <div *ngIf="patientForm.get('dob')?.invalid && patientForm.get('dob')?.touched" class="invalid-feedback d-block">
+              <i class="bi bi-exclamation-circle me-1"></i>
+              Date of birth is required
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" formControlName="password" placeholder="Minimum 6 characters" />
+            <div *ngIf="patientForm.get('password')?.invalid && patientForm.get('password')?.touched" class="invalid-feedback d-block">
+              <i class="bi bi-exclamation-circle me-1"></i>
+              Password must be at least 6 characters long
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="createPatient()" [disabled]="patientForm.invalid || loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ loading ? "Creating..." : "Create Patient" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop -->
+<div class="modal-backdrop fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'"></div>

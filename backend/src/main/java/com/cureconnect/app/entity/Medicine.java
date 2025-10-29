@@ -41,7 +41,7 @@ public class Medicine {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "updated_by") // Nullable, references doctor(id)
     private Doctor updatedBy;
 }

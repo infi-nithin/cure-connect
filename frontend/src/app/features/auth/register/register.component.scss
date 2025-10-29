@@ -5,50 +5,222 @@
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff" fill-opacity="0.05" points="0,0 1000,1000 0,1000"/></svg>');
+    background-size: cover;
+  }
 }
 
 .auth-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  padding: 40px;
-  max-width: 550px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  padding: 2.5rem;
+  max-width: 480px;
   width: 100%;
+  position: relative;
+  z-index: 1;
+  
+  @media (max-width: 480px) {
+    padding: 2rem 1.5rem;
+  }
 }
 
 .auth-title {
-  color: #333;
-  font-weight: 600;
-  margin-bottom: 8px;
+  color: #2d3748;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
   
   i {
     color: #667eea;
     font-size: 2rem;
+    margin-right: 0.5rem;
   }
 }
 
 .form-label {
-  font-weight: 500;
-  color: #555;
-  margin-bottom: 8px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
 
-.btn-primary {
+.input-group {
+  .input-group-text {
+    background-color: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    color: #718096;
+  }
+  
+  .form-control, .form-select {
+    border-left: none;
+    padding: 0.75rem;
+    
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      border-color: #667eea;
+      
+      + .input-group-text {
+        border-color: #667eea;
+      }
+    }
+    
+    &.is-invalid {
+      border-color: #e53e3e;
+      
+      + .input-group-text {
+        border-color: #e53e3e;
+      }
+    }
+    
+    &.is-valid {
+      border-color: #38a169;
+      
+      + .input-group-text {
+        border-color: #38a169;
+      }
+    }
+  }
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.invalid-feedback, .valid-feedback {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+.valid-feedback {
+  color: #38a169;
+  font-weight: 500;
+}
+
+.auth-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  padding: 12px;
-  font-weight: 500;
+  padding: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
   
-  &:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a3f8f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.alert {
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  
+  &.alert-danger {
+    background-color: #fed7d7;
+    color: #c53030;
+    border-left: 4px solid #e53e3e;
+  }
+}
+
+.doctor-fields {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+  
+  .form-label {
+    color: #2d3748;
   }
 }
 
 a {
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: color 0.2s ease;
   
   &:hover {
     text-decoration: underline;
+    color: #5a6fd8 !important;
   }
+}
+
+.text-muted {
+  color: #718096 !important;
+}
+
+// Animation for form elements
+.auth-card {
+  animation: slideUp 0.5s ease-out;
+}
+
+.doctor-fields {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.5);
+}
+
+.password-strength {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  
+  &.weak { color: #e53e3e; }
+  &.medium { color: #d69e2e; }
+  &.strong { color: #38a169; }
 }

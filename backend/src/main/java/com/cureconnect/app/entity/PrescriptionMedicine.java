@@ -24,12 +24,12 @@ public class PrescriptionMedicine {
     @EmbeddedId
     private PrescriptionMedicineId id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("prescriptionId")
     @JoinColumn(name = "prescription_id")
     private Prescription prescription;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("medicineId")
     @JoinColumn(name = "medicine_id")
     private Medicine medicine;

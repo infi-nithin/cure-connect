@@ -1,0 +1,31 @@
+.prescription-row:hover {
+  background-color: #f8f9fa;
+}
+
+.instruction-text {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.medicine-details {
+  max-height: 120px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.prescription-card {
+  .card {
+    border-left: 4px solid #007bff;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+}
