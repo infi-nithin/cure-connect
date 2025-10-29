@@ -65,9 +65,6 @@ pipeline {
                     cp docker-compose.yml /home/ubuntu/cure-connect/
                     cd /home/ubuntu/cure-connect
 
-                    # Load environment variables
-                    export $(cat .env | xargs)
-
                     # Pull latest images
                     docker-compose -f docker-compose.yml pull
 
