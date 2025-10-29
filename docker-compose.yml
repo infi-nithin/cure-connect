@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: infinithin/cure-connect-frontend:latest
     ports:
       - "8070:80"
     networks:
@@ -13,9 +11,7 @@ services:
       - backend
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: infinithin/cure-connect-backend:latest
     ports:
       - "8060:8060"
     environment:
